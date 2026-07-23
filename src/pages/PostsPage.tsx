@@ -14,6 +14,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Message } from 'primereact/message';
 import { Skeleton } from 'primereact/skeleton';
 import { FilterMatchMode } from 'primereact/api';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { deletePost, fetchPosts } from '../features/posts/postsSlice';
 import { fetchUsers } from '../features/users/usersSlice';
@@ -156,7 +158,7 @@ export default function PostsPage() {
     </div>
   );
 
-  // Columna Reacciones: likes 👍 y dislikes 👎.
+  // Columna Reacciones: likes y dislikes (con íconos, ver reactionsBody más abajo).
   const reactionsBody = (row: PostRow) => {
     const likes = typeof row.reactions === 'number' ? row.reactions : row.reactions.likes;
     const dislikes = typeof row.reactions === 'number' ? 0 : row.reactions.dislikes;
@@ -231,15 +233,15 @@ export default function PostsPage() {
   // Cabecera de la tabla: búsqueda global + filtros + limpiar.
   const tableHeader = (
     <div className="flex flex-column md:flex-row gap-3 md:align-items-center justify-content-between">
-      <span className="p-input-icon-left">
-        <i className="pi pi-search" />
+      <IconField iconPosition="left" className="w-full md:w-auto">
+        <InputIcon className="pi pi-search" />
         <InputText
           value={globalValue}
           onChange={(e) => setGlobalValue(e.target.value)}
           placeholder={t('posts.searchPlaceholder')}
           className="w-full"
         />
-      </span>
+      </IconField>
       <div className="flex flex-column sm:flex-row gap-2">
         <Dropdown
           value={selectedUserId}

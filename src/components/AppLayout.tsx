@@ -22,7 +22,10 @@ export default function AppLayout() {
       {/* Cabecera superior */}
       <header className="flex align-items-center justify-content-between px-4 py-3 surface-card shadow-2">
         <div className="flex align-items-center gap-3">
-          <span className="text-xl font-bold">📋 App</span>
+          <span className="text-xl font-bold flex align-items-center gap-2">
+            <i className="pi pi-clipboard" />
+            App
+          </span>
           {/* Navegación principal */}
           <nav className="flex gap-2">
             <NavLink to="/" end className={linkClass}>
