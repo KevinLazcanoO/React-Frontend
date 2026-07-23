@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import axiosClient from '../../api/axiosClient';
+import { clearPersistedState } from '../../app/persistence';
 import type { AuthState, LoginCredentials, LoginResponse } from './authTypes';
 
 // Claves con las que guardamos la sesión en localStorage (persistencia).
@@ -55,6 +56,7 @@ const authSlice = createSlice({
       state.error = null;
       localStorage.removeItem(TOKEN_KEY); // Borramos el token persistido.
       localStorage.removeItem(USER_KEY); // Borramos el usuario persistido.
+      clearPersistedState(); // Borramos el estado global persistido (ej. publicaciones cacheadas).
     },
     // Permite limpiar el error (ej. al cerrar un Toast o reintentar).
     clearAuthError: (state) => {

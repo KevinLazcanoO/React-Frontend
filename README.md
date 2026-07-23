@@ -36,6 +36,22 @@ contraseña: emilyspass
 
 ---
 
+## 📸 Capturas del flujo principal
+
+| Login | Tabla de publicaciones |
+| ----- | ---------------------- |
+| ![Login](docs/screenshots/01-login.png) | ![Tabla](docs/screenshots/02-tabla.png) |
+
+| Ver detalle | Formulario (con contadores) |
+| ----------- | --------------------------- |
+| ![Ver detalle](docs/screenshots/03-ver-detalle.png) | ![Formulario](docs/screenshots/04-formulario.png) |
+
+| Visor de PDF | Modo claro |
+| ------------ | ---------- |
+| ![PDF](docs/screenshots/05-pdf.png) | ![Modo claro](docs/screenshots/06-tabla-clara.png) |
+
+---
+
 ## 📦 Instalación y scripts
 
 ```bash
@@ -62,6 +78,29 @@ npm run format     # Formatea el código con Prettier
 5. **Estado global** — Slices `auth`, `posts`, `users` y `ui` (toasts y loading global). Peticiones con `createAsyncThunk`.
 6. **Calidad** — TypeScript estricto, ESLint + Prettier, accesibilidad básica y tests unitarios.
 
+### ✨ Extras implementados
+
+- **Modo oscuro / claro** — Toggle en la cabecera (y en el login) que intercambia el tema de PrimeReact (`lara-light-blue` ↔ `lara-dark-blue`) en caliente. La preferencia se persiste en `localStorage` y, la primera vez, respeta la del sistema (`prefers-color-scheme`). El tema se aplica antes del render para evitar parpadeo (FOUC).
+- **Contadores en el formulario** — Título `n/100`, Contenido `n/500` y Tags `n/5`, más un límite de `20` caracteres por tag. Los límites se aplican también con `maxLength` para impedir excederlos.
+- **Skeletons de carga** — La tabla muestra filas "fantasma" (`Skeleton`) durante la carga inicial, en lugar de una tabla vacía.
+- **Persistencia global del estado** — Las publicaciones se guardan en `localStorage` y se rehidratan al arrancar (`preloadedState`), de modo que las creadas/editadas **sobreviven a un refresco**. Un botón **Refrescar** vuelve a traer datos del servidor cuando se desee.
+- **Docker** — `Dockerfile` multi-stage (build con Node → servido con nginx) y `docker-compose.yml`.
+
+---
+
+## 🐳 Docker
+
+Build multi-stage: se compila con Node y se sirven los estáticos con **nginx** (con fallback a `index.html` para el enrutado de la SPA).
+
+```bash
+# Con docker-compose (recomendado)
+docker compose up --build     # App en http://localhost:8080
+
+# O manualmente
+docker build -t proyecto-evaluacion .
+docker run -p 8080:80 proyecto-evaluacion
+```
+
 ---
 
 ## 🗂️ Estructura del proyecto
@@ -70,8 +109,10 @@ npm run format     # Formatea el código con Prettier
 src/
 ├── api/axiosClient.ts          # Instancia de axios + interceptor que inyecta el token
 ├── app/
-│   ├── store.ts                # Configuración del store de Redux
+│   ├── store.ts                # Configuración del store de Redux (con preloadedState)
+│   ├── persistence.ts          # Guarda/rehidrata el estado en localStorage
 │   └── hooks.ts                # Hooks tipados (useAppDispatch / useAppSelector)
+├── theme/                      # Modo claro/oscuro (theme.ts + useTheme.ts)
 ├── features/                   # Un módulo por dominio (arquitectura por features)
 │   ├── auth/                   # authSlice, tipos y tests
 │   ├── posts/                  # postsSlice (CRUD), tipos y tests
@@ -79,6 +120,7 @@ src/
 │   └── ui/                     # uiSlice (toasts globales + loading), tests
 ├── components/
 │   ├── AppLayout.tsx           # Cabecera común de páginas privadas
+│   ├── ThemeToggle.tsx         # Botón de modo claro/oscuro
 │   ├── GlobalToast.tsx         # Toast único alimentado por Redux
 │   └── GlobalLoadingBar.tsx    # Barra de carga automática
 ├── routes/ProtectedRoute.tsx   # Guardia de rutas privadas
@@ -93,6 +135,8 @@ src/
 
 - **Filtrado y paginación en cliente.** DummyJSON no permite combinar en una sola petición búsqueda + filtro por usuario + filtro por varios tags. Como el dataset es pequeño (~251 posts), se cargan todos una vez y el `DataTable` gestiona búsqueda, filtros y paginación de forma que **se combinan correctamente entre sí**. El thunk `fetchPosts` acepta `{ limit, skip }` para migrar a modo _lazy_ (server-side) si el dataset creciera.
 - **Caché de carga.** `PostsPage` sólo consulta la API la primera vez (`status === 'idle'`), de modo que al volver del formulario se conservan en pantalla los cambios locales (altas/bajas/ediciones).
+- **Persistencia sin dependencias.** En lugar de `redux-persist`, un pequeño módulo (`app/persistence.ts`) guarda un subconjunto del estado en `localStorage` (con throttle) y lo rehidrata como `preloadedState`. Se usan tipos concretos —no `RootState`— para evitar una referencia circular de tipos, y `RootState` se deriva de `combineReducers`.
+- **Tema desacoplado del store.** El cambio de tema intercambia un `<link>` de CSS (vía imports `?url` de Vite) y se gestiona con un hook propio, sin acoplarlo a Redux.
 - **Notificaciones y loading centralizados.** El slice `ui` mantiene una cola de toasts y un contador de peticiones. Un único `GlobalToast` muestra los mensajes y una `GlobalLoadingBar` aparece automáticamente ante cualquier thunk en curso (vía `addMatcher` sobre las acciones `/pending` y `/fulfilled|/rejected`).
 
 ---
@@ -117,13 +161,13 @@ src/
 
 ## ⚠️ Nota sobre DummyJSON
 
-DummyJSON **simula** las escrituras: el `POST`, `PUT` y `DELETE` devuelven una respuesta correcta pero **no persisten** en el servidor. Por eso los cambios viven en el estado de Redux durante la sesión; una recarga completa del navegador (F5) restaura los datos originales de la API. Es el comportamiento esperado de esta API de pruebas.
+DummyJSON **simula** las escrituras: el `POST`, `PUT` y `DELETE` devuelven una respuesta correcta pero **no persisten** en el servidor. Por eso los cambios (marcados como `isLocal`) se aplican sobre el estado de Redux. Gracias a la **persistencia global**, esos cambios ahora **sobreviven a un refresco (F5)**; el botón **Refrescar** de la tabla permite volver a cargar los datos originales de la API cuando se quiera.
 
 ---
 
-## 🌟 Posibles mejoras (bonus)
+## 🌟 Posibles mejoras (bonus pendientes)
 
 - Migrar los thunks a **RTK Query**.
 - **Optimistic UI** en editar/eliminar.
-- Skeletons de carga en la tabla.
-- Tests E2E (Cypress/Playwright) y Dockerfile.
+- Tests E2E (Cypress/Playwright).
+- Deploy en Vercel / Netlify.

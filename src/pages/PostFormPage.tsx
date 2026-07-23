@@ -16,6 +16,12 @@ import type { PostFormData } from '../features/posts/postsTypes';
 // Valores por defecto de un formulario vacío (modo "crear").
 const emptyValues: PostFormData = { title: '', body: '', userId: 0, tags: [] };
 
+// Longitudes máximas para mantener las publicaciones breves y con buena UX.
+const TITLE_MAX = 100;
+const BODY_MAX = 500;
+const TAGS_MAX = 5; // Número máximo de tags por publicación.
+const TAG_TEXT_MAX = 20; // Longitud máxima del texto de cada tag.
+
 export default function PostFormPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -101,13 +107,23 @@ export default function PostFormPage() {
             <Controller
               name="title"
               control={control}
-              rules={{ required: 'El título es obligatorio' }} // Regla de validación.
+              rules={{
+                required: 'El título es obligatorio',
+                maxLength: { value: TITLE_MAX, message: `Máximo ${TITLE_MAX} caracteres` },
+              }}
               render={({ field, fieldState }) => (
-                <InputText
-                  id="title"
-                  {...field} // value + onChange que react-hook-form maneja por nosotros.
-                  className={fieldState.error ? 'p-invalid' : ''}
-                />
+                <>
+                  <InputText
+                    id="title"
+                    {...field} // value + onChange que react-hook-form maneja por nosotros.
+                    maxLength={TITLE_MAX} // Impide escribir más del límite.
+                    className={fieldState.error ? 'p-invalid' : ''}
+                  />
+                  {/* Contador de caracteres alineado a la derecha */}
+                  <small className="text-color-secondary align-self-end">
+                    {field.value.length}/{TITLE_MAX}
+                  </small>
+                </>
               )}
             />
             {errors.title && <small className="p-error">{errors.title.message}</small>}
@@ -122,15 +138,23 @@ export default function PostFormPage() {
               rules={{
                 required: 'El contenido es obligatorio',
                 minLength: { value: 10, message: 'Mínimo 10 caracteres' },
+                maxLength: { value: BODY_MAX, message: `Máximo ${BODY_MAX} caracteres` },
               }}
               render={({ field, fieldState }) => (
-                <InputTextarea
-                  id="body"
-                  rows={5}
-                  autoResize
-                  {...field}
-                  className={fieldState.error ? 'p-invalid' : ''}
-                />
+                <>
+                  <InputTextarea
+                    id="body"
+                    rows={5}
+                    autoResize
+                    {...field}
+                    maxLength={BODY_MAX} // Impide escribir más del límite.
+                    className={fieldState.error ? 'p-invalid' : ''}
+                  />
+                  {/* Contador de caracteres alineado a la derecha */}
+                  <small className="text-color-secondary align-self-end">
+                    {field.value.length}/{BODY_MAX}
+                  </small>
+                </>
               )}
             />
             {errors.body && <small className="p-error">{errors.body.message}</small>}
@@ -165,16 +189,27 @@ export default function PostFormPage() {
               name="tags"
               control={control}
               render={({ field }) => (
-                <Chips
-                  id="tags"
-                  value={field.value}
-                  onChange={(e) => field.onChange(e.value ?? [])}
-                  placeholder="Escribe y pulsa Enter"
-                  className="w-full"
-                />
+                <>
+                  <Chips
+                    id="tags"
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.value ?? [])}
+                    max={TAGS_MAX} // Impide añadir más tags del límite.
+                    // Limita la longitud del texto de cada tag (input interno).
+                    pt={{ input: { maxLength: TAG_TEXT_MAX } }}
+                    placeholder="Escribe y pulsa Enter"
+                    className="w-full"
+                  />
+                  {/* Contador de tags alineado a la derecha */}
+                  <small className="text-color-secondary align-self-end">
+                    {field.value.length}/{TAGS_MAX}
+                  </small>
+                </>
               )}
             />
-            <small className="text-color-secondary">Pulsa Enter para añadir cada tag.</small>
+            <small className="text-color-secondary">
+              Pulsa Enter para añadir cada tag (máx. {TAG_TEXT_MAX} caracteres por tag).
+            </small>
           </div>
 
           {/* --- Botones --- */}

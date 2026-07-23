@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: proyecto-evaluacion:latest
+    container_name: proyecto-evaluacion
+    ports:
+      # Accedemos a la app en http://localhost:8080 (nginx escucha en el 80 del contenedor).
+      - '8080:80'
+    restart: unless-stopped

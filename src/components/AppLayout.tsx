@@ -3,6 +3,7 @@ import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { logout } from '../features/auth/authSlice';
+import ThemeToggle from './ThemeToggle';
 
 // Layout común de las páginas privadas: cabecera fija + contenido (Outlet).
 export default function AppLayout() {
@@ -31,6 +32,8 @@ export default function AppLayout() {
         </div>
 
         <div className="flex align-items-center gap-3">
+          {/* Alternar modo claro/oscuro */}
+          <ThemeToggle />
           {/* Avatar con la foto del usuario y su nombre */}
           <Avatar image={user?.image} shape="circle" />
           <span className="hidden sm:inline">

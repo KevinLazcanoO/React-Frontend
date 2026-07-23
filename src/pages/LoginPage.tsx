@@ -6,6 +6,7 @@ import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Message } from 'primereact/message';
+import ThemeToggle from '../components/ThemeToggle';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { login } from '../features/auth/authSlice';
 import { showToast } from '../features/ui/uiSlice';
@@ -50,6 +51,10 @@ export default function LoginPage() {
 
   return (
     <div className="flex align-items-center justify-content-center min-h-screen surface-ground p-3">
+      {/* Toggle de tema fijo en la esquina superior derecha */}
+      <div className="absolute" style={{ top: '1rem', right: '1rem' }}>
+        <ThemeToggle tooltipPosition="left" />
+      </div>
       <Card title="Iniciar sesión" className="w-full" style={{ maxWidth: '25rem' }}>
         {/* handleSubmit valida y, si todo es correcto, llama a onSubmit */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-column gap-3">

@@ -11,6 +11,7 @@ import { Tag } from 'primereact/tag';
 import { Dialog } from 'primereact/dialog';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Message } from 'primereact/message';
+import { Skeleton } from 'primereact/skeleton';
 import { FilterMatchMode } from 'primereact/api';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { deletePost, fetchPosts } from '../features/posts/postsSlice';
@@ -41,6 +42,15 @@ export default function PostsPage() {
 
   // PrimeReact usa este objeto para la búsqueda global (matchMode CONTAINS = "contiene").
   const filters = { global: { value: globalValue, matchMode: FilterMatchMode.CONTAINS } };
+
+  // ¿Estamos en la carga inicial? (para mostrar skeletons en lugar de una tabla vacía).
+  const loading = status === 'loading';
+
+  // Filas "fantasma" que alimentan la tabla mientras carga: solo necesitan un id único.
+  const skeletonRows = useMemo(() => Array.from({ length: 5 }, (_, i) => ({ id: -i - 1 }) as PostRow), []);
+
+  // Celda de carga: una barra de esqueleto que ocupa el ancho de la columna.
+  const skeletonBody = () => <Skeleton width="80%" height="1.2rem" />;
 
   // Cargamos del servidor SOLO la primera vez (status 'idle'). Así, al volver del formulario
   // no re-consultamos y conservamos los cambios locales (altas/bajas/ediciones) en pantalla.
@@ -184,10 +194,24 @@ export default function PostsPage() {
     </div>
   );
 
-  // Barra de herramientas: título + botón "Nueva publicación" (Punto 3).
+  // Fuerza una recarga desde el servidor (útil porque las publicaciones se persisten en local).
+  const onRefresh = () => dispatch(fetchPosts());
+
+  // Barra de herramientas: título + acciones (Refrescar y Nueva publicación).
   const toolbarStart = <span className="text-lg font-semibold">Listado de publicaciones</span>;
   const toolbarEnd = (
-    <Button label="Nueva publicación" icon="pi pi-plus" onClick={() => navigate('/posts/new')} />
+    <div className="flex gap-2">
+      <Button
+        label="Refrescar"
+        icon="pi pi-refresh"
+        outlined
+        onClick={onRefresh}
+        loading={loading}
+        tooltip="Traer datos frescos del servidor"
+        tooltipOptions={{ position: 'bottom' }}
+      />
+      <Button label="Nueva publicación" icon="pi pi-plus" onClick={() => navigate('/posts/new')} />
+    </div>
   );
 
   // Cabecera de la tabla: búsqueda global + filtros + limpiar.
@@ -239,9 +263,9 @@ export default function PostsPage() {
       )}
 
       <DataTable
-        value={filteredRows}
+        // Durante la carga mostramos filas fantasma; después, los datos reales.
+        value={loading ? skeletonRows : filteredRows}
         header={tableHeader}
-        loading={status === 'loading'} // Overlay de carga mientras se piden los datos.
         dataKey="id"
         paginator // Activa la paginación.
         rows={10} // Filas por página.
@@ -254,18 +278,31 @@ export default function PostsPage() {
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         currentPageReportTemplate="{first}-{last} de {totalRecords}"
       >
-        <Column field="id" header="ID" sortable style={{ width: '5rem' }} />
-        <Column field="title" header="Título" sortable />
-        <Column field="userName" header="Usuario" sortable style={{ minWidth: '10rem' }} />
-        <Column header="Tags" body={tagsBody} style={{ minWidth: '12rem' }} />
+        {/* Cada columna muestra un Skeleton mientras carga, o su contenido real después. */}
+        <Column
+          field="id"
+          header="ID"
+          sortable={!loading}
+          style={{ width: '5rem' }}
+          body={loading ? skeletonBody : undefined}
+        />
+        <Column field="title" header="Título" sortable={!loading} body={loading ? skeletonBody : undefined} />
+        <Column
+          field="userName"
+          header="Usuario"
+          sortable={!loading}
+          style={{ minWidth: '10rem' }}
+          body={loading ? skeletonBody : undefined}
+        />
+        <Column header="Tags" body={loading ? skeletonBody : tagsBody} style={{ minWidth: '12rem' }} />
         <Column
           field="reactionsTotal"
           header="Reacciones"
-          body={reactionsBody}
-          sortable
+          body={loading ? skeletonBody : reactionsBody}
+          sortable={!loading}
           style={{ minWidth: '9rem' }}
         />
-        <Column header="Acciones" body={actionsBody} style={{ width: '11rem' }} />
+        <Column header="Acciones" body={loading ? skeletonBody : actionsBody} style={{ width: '11rem' }} />
       </DataTable>
 
       {/* Dialog de "Ver": muestra el detalle completo del post seleccionado */}

@@ -13,3 +13,9 @@ body,
 body {
   font-family: var(--font-family); /* Usa la tipografía del tema de PrimeReact. */
 }
+
+/* Evita que el texto de los tooltips se parta en varias líneas cuando el
+   elemento está pegado al borde de la pantalla (ej. el toggle de tema). */
+.p-tooltip .p-tooltip-text {
+  white-space: nowrap;
+}
