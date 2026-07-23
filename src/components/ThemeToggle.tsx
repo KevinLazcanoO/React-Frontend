@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button } from 'primereact/button';
 import { useTheme } from '../theme/useTheme';
 
@@ -14,6 +15,7 @@ interface ThemeToggleProps {
 // Muestra el icono del tema al que se cambiaría, con aria-label accesible.
 export default function ThemeToggle({ tooltipPosition = 'bottom' }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
   const isDark = theme === 'dark';
 
   return (
@@ -23,8 +25,8 @@ export default function ThemeToggle({ tooltipPosition = 'bottom' }: ThemeToggleP
       text
       severity="secondary"
       onClick={toggleTheme}
-      aria-label={isDark ? 'Activar modo claro' : 'Activar modo oscuro'}
-      tooltip={isDark ? 'Modo claro' : 'Modo oscuro'}
+      aria-label={isDark ? t('theme.toLight') : t('theme.toDark')}
+      tooltip={isDark ? t('theme.light') : t('theme.dark')}
       tooltipOptions={{ position: tooltipPosition }}
     />
   );

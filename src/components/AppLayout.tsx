@@ -1,14 +1,17 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { logout } from '../features/auth/authSlice';
 import ThemeToggle from './ThemeToggle';
+import LanguageSelector from './LanguageSelector';
 
 // Layout común de las páginas privadas: cabecera fija + contenido (Outlet).
 export default function AppLayout() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
+  const { t } = useTranslation();
 
   // Clase dinámica: resalta el enlace de la ruta activa (NavLink expone isActive).
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -23,15 +26,17 @@ export default function AppLayout() {
           {/* Navegación principal */}
           <nav className="flex gap-2">
             <NavLink to="/" end className={linkClass}>
-              Publicaciones
+              {t('nav.posts')}
             </NavLink>
             <NavLink to="/docs" className={linkClass}>
-              Ayuda
+              {t('nav.help')}
             </NavLink>
           </nav>
         </div>
 
         <div className="flex align-items-center gap-3">
+          {/* Selector de idioma */}
+          <LanguageSelector />
           {/* Alternar modo claro/oscuro */}
           <ThemeToggle />
           {/* Avatar con la foto del usuario y su nombre */}
@@ -41,7 +46,7 @@ export default function AppLayout() {
           </span>
           {/* Logout: limpia Redux + localStorage y la ruta protegida redirige a /login */}
           <Button
-            label="Salir"
+            label={t('actions.logout')}
             icon="pi pi-sign-out"
             severity="secondary"
             text

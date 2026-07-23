@@ -8,6 +8,7 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: 'http://localhost:5173', // URL del servidor de desarrollo.
+    locale: 'es-ES', // Fijamos el idioma para que los tests sean deterministas (UI en español).
     trace: 'on-first-retry', // Guarda un trace si un test falla al reintentar.
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

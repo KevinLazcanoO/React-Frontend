@@ -13,7 +13,7 @@ test.describe('Flujo principal', () => {
   test('login correcto muestra la tabla de publicaciones', async ({ page }) => {
     await page.goto('/login');
     // Las credenciales vienen precargadas; solo pulsamos "Entrar".
-    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('button', { name: 'Acceder' }).click();
 
     // Tras autenticar, se ve la cabecera del usuario y el listado.
     await expect(page.getByText('Listado de publicaciones')).toBeVisible();
@@ -24,11 +24,11 @@ test.describe('Flujo principal', () => {
 
   test('la búsqueda global filtra la tabla', async ({ page }) => {
     await page.goto('/login');
-    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('button', { name: 'Acceder' }).click();
     await expect(page.getByText('Listado de publicaciones')).toBeVisible();
 
     // Escribimos en el buscador y comprobamos que se filtra.
-    await page.getByPlaceholder('Buscar título, autor o tag...').fill('candy bar');
+    await page.getByPlaceholder('Buscar por título, autor o etiqueta…').fill('candy bar');
     await expect(page.getByText('All he wanted was a candy bar.')).toBeVisible();
     await expect(page.getByText('His mother had always taught him')).toHaveCount(0);
   });

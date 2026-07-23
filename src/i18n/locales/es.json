@@ -1,0 +1,99 @@
+{
+  "common": {
+    "error": "Error"
+  },
+  "nav": {
+    "posts": "Publicaciones",
+    "help": "Ayuda"
+  },
+  "actions": {
+    "logout": "Cerrar sesión",
+    "cancel": "Cancelar",
+    "refresh": "Actualizar",
+    "clear": "Limpiar",
+    "download": "Descargar",
+    "create": "Crear",
+    "save": "Guardar cambios",
+    "view": "Ver",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "theme": {
+    "toDark": "Activar modo oscuro",
+    "toLight": "Activar modo claro",
+    "dark": "Modo oscuro",
+    "light": "Modo claro"
+  },
+  "language": {
+    "label": "Idioma",
+    "spanish": "Español",
+    "english": "Inglés"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "submit": "Acceder",
+    "usernameRequired": "El usuario es obligatorio.",
+    "passwordRequired": "La contraseña es obligatoria.",
+    "error": "Error de autenticación."
+  },
+  "posts": {
+    "listTitle": "Listado de publicaciones",
+    "new": "Nueva publicación",
+    "refreshTooltip": "Obtener los datos actualizados del servidor",
+    "searchPlaceholder": "Buscar por título, autor o etiqueta…",
+    "filterUser": "Filtrar por autor",
+    "filterTags": "Filtrar por etiquetas",
+    "colId": "ID",
+    "colTitle": "Título",
+    "colUser": "Autor",
+    "colTags": "Etiquetas",
+    "colReactions": "Reacciones",
+    "colActions": "Acciones",
+    "empty": "No se encontraron publicaciones.",
+    "loadError": "No se pudieron cargar las publicaciones.",
+    "pageReport": "{first}-{last} de {totalRecords}",
+    "confirmDeleteHeader": "Confirmar eliminación",
+    "confirmDeleteMessage": "¿Desea eliminar la publicación «{{title}}»?",
+    "confirmAccept": "Sí, eliminar",
+    "deletedSummary": "Eliminada",
+    "deletedDetail": "La publicación se eliminó correctamente.",
+    "deleteErrorDetail": "No se pudo eliminar la publicación.",
+    "viewAuthor": "Autor"
+  },
+  "form": {
+    "newTitle": "Nueva publicación",
+    "editTitle": "Editar publicación",
+    "titleLabel": "Título",
+    "contentLabel": "Contenido",
+    "authorLabel": "Autor",
+    "tagsLabel": "Etiquetas",
+    "authorPlaceholder": "Seleccione un autor",
+    "tagsPlaceholder": "Escriba y pulse Intro",
+    "tagsHelp": "Pulse Intro para añadir cada etiqueta (máx. {{max}} caracteres por etiqueta).",
+    "titleRequired": "El título es obligatorio.",
+    "titleMax": "El título admite un máximo de {{max}} caracteres.",
+    "contentRequired": "El contenido es obligatorio.",
+    "contentMin": "El contenido debe tener al menos {{min}} caracteres.",
+    "contentMax": "El contenido admite un máximo de {{max}} caracteres.",
+    "authorRequired": "Seleccione un autor.",
+    "createdSummary": "Publicación creada",
+    "updatedSummary": "Publicación actualizada",
+    "createdDetail": "La publicación se creó correctamente.",
+    "updatedDetail": "La publicación se actualizó correctamente.",
+    "saveErrorSummary": "Error",
+    "saveErrorDetail": "No se pudo guardar la publicación."
+  },
+  "docs": {
+    "title": "Ayuda y documentación",
+    "prev": "Página anterior",
+    "next": "Página siguiente",
+    "pageInput": "Número de página",
+    "zoomOut": "Reducir",
+    "zoomReset": "Restablecer zoom",
+    "zoomIn": "Ampliar",
+    "download": "Descargar",
+    "loadError": "No se pudo cargar el documento PDF."
+  }
+}

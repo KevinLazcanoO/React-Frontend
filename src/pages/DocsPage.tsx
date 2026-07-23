@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -21,6 +22,7 @@ const FILE_URL = '/manual-ayuda.pdf';
 const FILE_NAME = 'manual-ayuda.pdf';
 
 export default function DocsPage() {
+  const { t } = useTranslation();
   const [numPages, setNumPages] = useState(0); // Total de páginas (lo da el PDF al cargar).
   const [pageNumber, setPageNumber] = useState(1); // Página actual.
   const [scale, setScale] = useState(1.0); // Nivel de zoom.
@@ -66,14 +68,14 @@ export default function DocsPage() {
           text
           onClick={goPrev}
           disabled={pageNumber <= 1}
-          aria-label="Anterior"
+          aria-label={t('docs.prev')}
         />
         <span className="flex align-items-center gap-1">
           <InputText
             value={String(pageNumber)}
             onChange={(e) => onPageInput(e.target.value)}
             className="w-3rem text-center p-1"
-            aria-label="Número de página"
+            aria-label={t('docs.pageInput')}
           />
           <span className="text-color-secondary">/ {numPages || '-'}</span>
         </span>
@@ -83,7 +85,7 @@ export default function DocsPage() {
           text
           onClick={goNext}
           disabled={pageNumber >= numPages}
-          aria-label="Siguiente"
+          aria-label={t('docs.next')}
         />
       </div>
 
@@ -95,13 +97,13 @@ export default function DocsPage() {
           text
           onClick={zoomOut}
           disabled={scale <= 0.5}
-          aria-label="Alejar"
+          aria-label={t('docs.zoomOut')}
         />
         <Button
           label={`${Math.round(scale * 100)}%`}
           text
           onClick={zoomReset}
-          aria-label="Restablecer zoom"
+          aria-label={t('docs.zoomReset')}
         />
         <Button
           icon="pi pi-search-plus"
@@ -109,17 +111,17 @@ export default function DocsPage() {
           text
           onClick={zoomIn}
           disabled={scale >= 3}
-          aria-label="Acercar"
+          aria-label={t('docs.zoomIn')}
         />
       </div>
 
       {/* Descarga */}
-      <Button label="Descargar" icon="pi pi-download" onClick={handleDownload} />
+      <Button label={t('docs.download')} icon="pi pi-download" onClick={handleDownload} />
     </div>
   );
 
   return (
-    <Card title="Ayuda / Documentación" header={<div className="p-3 pb-0">{header}</div>}>
+    <Card title={t('docs.title')} header={<div className="p-3 pb-0">{header}</div>}>
       {error && <Message severity="error" text={error} className="mb-3 w-full" />}
 
       {/* Contenedor con scroll por si el PDF es más grande que la ventana */}
@@ -130,7 +132,7 @@ export default function DocsPage() {
         <Document
           file={FILE_URL}
           onLoadSuccess={onLoadSuccess}
-          onLoadError={() => setError('No se pudo cargar el PDF.')}
+          onLoadError={() => setError(t('docs.loadError'))}
           loading={<ProgressSpinner />} // Spinner mientras se descarga/parses el documento.
         >
           {/* Renderizamos SOLO la página actual, aplicando el zoom (scale) */}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -29,6 +30,7 @@ interface PostRow extends Post {
 export default function PostsPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Leemos posts y usuarios del estado global.
   const { items: posts, status, error } = useAppSelector((state) => state.posts);
@@ -113,19 +115,31 @@ export default function PostsPage() {
   // "Eliminar": pide confirmación y, si acepta, despacha el thunk de borrado.
   const onDelete = (row: PostRow) => {
     confirmDialog({
-      message: `¿Eliminar la publicación "${row.title}"?`,
-      header: 'Confirmar eliminación',
+      message: t('posts.confirmDeleteMessage', { title: row.title }),
+      header: t('posts.confirmDeleteHeader'),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: t('posts.confirmAccept'),
+      rejectLabel: t('actions.cancel'),
       acceptClassName: 'p-button-danger',
       accept: async () => {
         // Pasamos isLocal para que los posts creados en la app se borren sin llamar a la API.
         const result = await dispatch(deletePost({ id: row.id, isLocal: row.isLocal }));
         if (deletePost.fulfilled.match(result)) {
-          dispatch(showToast({ severity: 'success', summary: 'Eliminado', detail: 'Publicación eliminada' }));
+          dispatch(
+            showToast({
+              severity: 'success',
+              summary: t('posts.deletedSummary'),
+              detail: t('posts.deletedDetail'),
+            }),
+          );
         } else {
-          dispatch(showToast({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar' }));
+          dispatch(
+            showToast({
+              severity: 'error',
+              summary: t('common.error'),
+              detail: t('posts.deleteErrorDetail'),
+            }),
+          );
         }
       },
     });
@@ -166,8 +180,8 @@ export default function PostsPage() {
         rounded
         text
         severity="info"
-        aria-label="Ver"
-        tooltip="Ver"
+        aria-label={t('actions.view')}
+        tooltip={t('actions.view')}
         tooltipOptions={tooltipTop}
         onClick={() => onView(row)}
       />
@@ -176,8 +190,8 @@ export default function PostsPage() {
         rounded
         text
         severity="warning"
-        aria-label="Editar"
-        tooltip="Editar"
+        aria-label={t('actions.edit')}
+        tooltip={t('actions.edit')}
         tooltipOptions={tooltipTop}
         onClick={() => onEdit(row)}
       />
@@ -186,8 +200,8 @@ export default function PostsPage() {
         rounded
         text
         severity="danger"
-        aria-label="Eliminar"
-        tooltip="Eliminar"
+        aria-label={t('actions.delete')}
+        tooltip={t('actions.delete')}
         tooltipOptions={tooltipTop}
         onClick={() => onDelete(row)}
       />
@@ -198,19 +212,19 @@ export default function PostsPage() {
   const onRefresh = () => dispatch(fetchPosts());
 
   // Barra de herramientas: título + acciones (Refrescar y Nueva publicación).
-  const toolbarStart = <span className="text-lg font-semibold">Listado de publicaciones</span>;
+  const toolbarStart = <span className="text-lg font-semibold">{t('posts.listTitle')}</span>;
   const toolbarEnd = (
     <div className="flex gap-2">
       <Button
-        label="Refrescar"
+        label={t('actions.refresh')}
         icon="pi pi-refresh"
         outlined
         onClick={onRefresh}
         loading={loading}
-        tooltip="Traer datos frescos del servidor"
+        tooltip={t('posts.refreshTooltip')}
         tooltipOptions={{ position: 'bottom' }}
       />
-      <Button label="Nueva publicación" icon="pi pi-plus" onClick={() => navigate('/posts/new')} />
+      <Button label={t('posts.new')} icon="pi pi-plus" onClick={() => navigate('/posts/new')} />
     </div>
   );
 
@@ -222,7 +236,7 @@ export default function PostsPage() {
         <InputText
           value={globalValue}
           onChange={(e) => setGlobalValue(e.target.value)}
-          placeholder="Buscar título, autor o tag..."
+          placeholder={t('posts.searchPlaceholder')}
           className="w-full"
         />
       </span>
@@ -231,7 +245,7 @@ export default function PostsPage() {
           value={selectedUserId}
           options={users.map((u) => ({ label: `${u.firstName} ${u.lastName}`, value: u.id }))}
           onChange={(e) => setSelectedUserId(e.value)}
-          placeholder="Filtrar por usuario"
+          placeholder={t('posts.filterUser')}
           showClear
           filter
           className="w-full sm:w-14rem"
@@ -240,12 +254,12 @@ export default function PostsPage() {
           value={selectedTags}
           options={tagOptions}
           onChange={(e) => setSelectedTags(e.value)}
-          placeholder="Filtrar por tags"
+          placeholder={t('posts.filterTags')}
           maxSelectedLabels={2}
           showClear
           className="w-full sm:w-14rem"
         />
-        <Button icon="pi pi-filter-slash" label="Limpiar" outlined onClick={clearFilters} />
+        <Button icon="pi pi-filter-slash" label={t('actions.clear')} outlined onClick={clearFilters} />
       </div>
     </div>
   );
@@ -259,7 +273,7 @@ export default function PostsPage() {
 
       {/* Si la carga falló, mostramos un mensaje de error accesible */}
       {status === 'failed' && (
-        <Message severity="error" text={error ?? 'Error al cargar'} className="mb-3 w-full" />
+        <Message severity="error" text={error ?? t('posts.loadError')} className="mb-3 w-full" />
       )}
 
       <DataTable
@@ -272,37 +286,42 @@ export default function PostsPage() {
         rowsPerPageOptions={[10, 20, 50]} // Opciones de tamaño de página.
         filters={filters} // Objeto que controla la búsqueda global.
         globalFilterFields={['title', 'userName', 'tagsString']} // Campos sobre los que busca.
-        emptyMessage="No se encontraron publicaciones." // Mensaje cuando no hay resultados.
+        emptyMessage={t('posts.empty')} // Mensaje cuando no hay resultados.
         stripedRows
         removableSort
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="{first}-{last} de {totalRecords}"
+        currentPageReportTemplate={t('posts.pageReport')}
       >
         {/* Cada columna muestra un Skeleton mientras carga, o su contenido real después. */}
         <Column
           field="id"
-          header="ID"
+          header={t('posts.colId')}
           sortable={!loading}
           style={{ width: '5rem' }}
           body={loading ? skeletonBody : undefined}
         />
-        <Column field="title" header="Título" sortable={!loading} body={loading ? skeletonBody : undefined} />
+        <Column
+          field="title"
+          header={t('posts.colTitle')}
+          sortable={!loading}
+          body={loading ? skeletonBody : undefined}
+        />
         <Column
           field="userName"
-          header="Usuario"
+          header={t('posts.colUser')}
           sortable={!loading}
           style={{ minWidth: '10rem' }}
           body={loading ? skeletonBody : undefined}
         />
-        <Column header="Tags" body={loading ? skeletonBody : tagsBody} style={{ minWidth: '12rem' }} />
+        <Column header={t('posts.colTags')} body={loading ? skeletonBody : tagsBody} style={{ minWidth: '12rem' }} />
         <Column
           field="reactionsTotal"
-          header="Reacciones"
+          header={t('posts.colReactions')}
           body={loading ? skeletonBody : reactionsBody}
           sortable={!loading}
           style={{ minWidth: '9rem' }}
         />
-        <Column header="Acciones" body={loading ? skeletonBody : actionsBody} style={{ width: '11rem' }} />
+        <Column header={t('posts.colActions')} body={loading ? skeletonBody : actionsBody} style={{ width: '11rem' }} />
       </DataTable>
 
       {/* Dialog de "Ver": muestra el detalle completo del post seleccionado */}
@@ -322,7 +341,7 @@ export default function PostsPage() {
               ))}
             </div>
             <small className="text-color-secondary">
-              Autor: {viewPost.userName} · {reactionsBody(viewPost)}
+              {t('posts.viewAuthor')}: {viewPost.userName} · {reactionsBody(viewPost)}
             </small>
           </div>
         )}

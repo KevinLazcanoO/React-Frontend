@@ -17,6 +17,7 @@ La API de datos es la pública **[DummyJSON](https://dummyjson.com)**.
 | **PrimeReact + PrimeFlex + PrimeIcons**| Componentes UI y layout              |
 | **Axios**                              | Peticiones HTTP (con interceptor)    |
 | **react-hook-form**                    | Formularios y validaciones           |
+| **react-i18next**                      | Internacionalización (ES / EN)       |
 | **react-pdf**                          | Renderizado de PDF                   |
 | **Vitest + Testing Library**           | Tests unitarios                      |
 | **ESLint + Prettier**                  | Calidad y formato de código          |
@@ -83,6 +84,7 @@ npm run format     # Formatea el código con Prettier
 
 ### ✨ Extras implementados
 
+- **Internacionalización (ES / EN)** — Toda la interfaz está traducida con **react-i18next**. Un selector en la cabecera (y en el login) cambia el idioma en caliente; la elección se detecta del navegador la primera vez y se **persiste** en `localStorage`.
 - **Modo oscuro / claro** — Toggle en la cabecera (y en el login) que intercambia el tema de PrimeReact (`lara-light-blue` ↔ `lara-dark-blue`) en caliente. La preferencia se persiste en `localStorage` y, la primera vez, respeta la del sistema (`prefers-color-scheme`). El tema se aplica antes del render para evitar parpadeo (FOUC).
 - **Contadores en el formulario** — Título `n/100`, Contenido `n/500` y Tags `n/5`, más un límite de `20` caracteres por tag. Los límites se aplican también con `maxLength` para impedir excederlos.
 - **Skeletons de carga** — La tabla muestra filas "fantasma" (`Skeleton`) durante la carga inicial, en lugar de una tabla vacía.
@@ -128,6 +130,7 @@ src/
 │   ├── persistence.ts          # Guarda/rehidrata el estado en localStorage
 │   └── hooks.ts                # Hooks tipados (useAppDispatch / useAppSelector)
 ├── theme/                      # Modo claro/oscuro (theme.ts + useTheme.ts)
+├── i18n/                       # Internacionalización (config + locales es/en)
 ├── features/                   # Un módulo por dominio (arquitectura por features)
 │   ├── auth/                   # authSlice, tipos y tests
 │   ├── posts/                  # postsSlice (CRUD), tipos y tests
@@ -136,6 +139,7 @@ src/
 ├── components/
 │   ├── AppLayout.tsx           # Cabecera común de páginas privadas
 │   ├── ThemeToggle.tsx         # Botón de modo claro/oscuro
+│   ├── LanguageSelector.tsx    # Selector de idioma (ES / EN)
 │   ├── GlobalToast.tsx         # Toast único alimentado por Redux
 │   └── GlobalLoadingBar.tsx    # Barra de carga automática
 ├── routes/ProtectedRoute.tsx   # Guardia de rutas privadas

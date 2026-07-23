@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -25,6 +26,7 @@ const TAG_TEXT_MAX = 20; // Longitud máxima del texto de cada tag.
 export default function PostFormPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Si la URL trae :id, estamos EDITANDO; si no, estamos CREANDO.
   const { id } = useParams<{ id: string }>();
@@ -80,13 +82,19 @@ export default function PostFormPage() {
       dispatch(
         showToast({
           severity: 'success',
-          summary: isEdit ? 'Actualizado' : 'Creado',
-          detail: `Publicación ${isEdit ? 'actualizada' : 'creada'} correctamente`,
+          summary: isEdit ? t('form.updatedSummary') : t('form.createdSummary'),
+          detail: isEdit ? t('form.updatedDetail') : t('form.createdDetail'),
         }),
       );
       navigate('/');
     } else {
-      dispatch(showToast({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar' }));
+      dispatch(
+        showToast({
+          severity: 'error',
+          summary: t('form.saveErrorSummary'),
+          detail: t('form.saveErrorDetail'),
+        }),
+      );
     }
   };
 
@@ -96,20 +104,20 @@ export default function PostFormPage() {
   return (
     <div className="flex justify-content-center">
       <Card
-        title={isEdit ? 'Editar publicación' : 'Nueva publicación'}
+        title={isEdit ? t('form.editTitle') : t('form.newTitle')}
         className="w-full"
         style={{ maxWidth: '40rem' }}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-column gap-3">
           {/* --- Título --- */}
           <div className="flex flex-column gap-2">
-            <label htmlFor="title">Título *</label>
+            <label htmlFor="title">{t('form.titleLabel')} *</label>
             <Controller
               name="title"
               control={control}
               rules={{
-                required: 'El título es obligatorio',
-                maxLength: { value: TITLE_MAX, message: `Máximo ${TITLE_MAX} caracteres` },
+                required: t('form.titleRequired'),
+                maxLength: { value: TITLE_MAX, message: t('form.titleMax', { max: TITLE_MAX }) },
               }}
               render={({ field, fieldState }) => (
                 <>
@@ -131,14 +139,14 @@ export default function PostFormPage() {
 
           {/* --- Cuerpo --- */}
           <div className="flex flex-column gap-2">
-            <label htmlFor="body">Contenido *</label>
+            <label htmlFor="body">{t('form.contentLabel')} *</label>
             <Controller
               name="body"
               control={control}
               rules={{
-                required: 'El contenido es obligatorio',
-                minLength: { value: 10, message: 'Mínimo 10 caracteres' },
-                maxLength: { value: BODY_MAX, message: `Máximo ${BODY_MAX} caracteres` },
+                required: t('form.contentRequired'),
+                minLength: { value: 10, message: t('form.contentMin', { min: 10 }) },
+                maxLength: { value: BODY_MAX, message: t('form.contentMax', { max: BODY_MAX }) },
               }}
               render={({ field, fieldState }) => (
                 <>
@@ -162,18 +170,18 @@ export default function PostFormPage() {
 
           {/* --- Usuario (Dropdown) --- */}
           <div className="flex flex-column gap-2">
-            <label htmlFor="userId">Autor *</label>
+            <label htmlFor="userId">{t('form.authorLabel')} *</label>
             <Controller
               name="userId"
               control={control}
-              rules={{ validate: (v) => v > 0 || 'Selecciona un autor' }} // 0 = sin seleccionar.
+              rules={{ validate: (v) => v > 0 || t('form.authorRequired') }} // 0 = sin seleccionar.
               render={({ field, fieldState }) => (
                 <Dropdown
                   id="userId"
                   value={field.value}
                   onChange={(e) => field.onChange(e.value)}
                   options={userOptions}
-                  placeholder="Selecciona un autor"
+                  placeholder={t('form.authorPlaceholder')}
                   filter
                   className={fieldState.error ? 'p-invalid' : ''}
                 />
@@ -184,7 +192,7 @@ export default function PostFormPage() {
 
           {/* --- Tags (Chips) --- */}
           <div className="flex flex-column gap-2">
-            <label htmlFor="tags">Tags</label>
+            <label htmlFor="tags">{t('form.tagsLabel')}</label>
             <Controller
               name="tags"
               control={control}
@@ -197,7 +205,7 @@ export default function PostFormPage() {
                     max={TAGS_MAX} // Impide añadir más tags del límite.
                     // Limita la longitud del texto de cada tag (input interno).
                     pt={{ input: { maxLength: TAG_TEXT_MAX } }}
-                    placeholder="Escribe y pulsa Enter"
+                    placeholder={t('form.tagsPlaceholder')}
                     className="w-full"
                   />
                   {/* Contador de tags alineado a la derecha */}
@@ -208,7 +216,7 @@ export default function PostFormPage() {
               )}
             />
             <small className="text-color-secondary">
-              Pulsa Enter para añadir cada tag (máx. {TAG_TEXT_MAX} caracteres por tag).
+              {t('form.tagsHelp', { max: TAG_TEXT_MAX })}
             </small>
           </div>
 
@@ -216,14 +224,14 @@ export default function PostFormPage() {
           <div className="flex justify-content-end gap-2 mt-2">
             <Button
               type="button"
-              label="Cancelar"
+              label={t('actions.cancel')}
               severity="secondary"
               outlined
               onClick={() => navigate('/')}
             />
             <Button
               type="submit"
-              label={isEdit ? 'Guardar cambios' : 'Crear'}
+              label={isEdit ? t('actions.save') : t('actions.create')}
               icon="pi pi-check"
               loading={isSubmitting} // Spinner mientras se envía.
             />

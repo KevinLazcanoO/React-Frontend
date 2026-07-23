@@ -5,6 +5,7 @@ import { PrimeReactProvider } from 'primereact/api';
 import App from './App';
 import { store } from './app/store';
 import { applyTheme, getStoredTheme } from './theme/theme';
+import './i18n'; // Inicializa i18next (idiomas ES/EN) antes de renderizar.
 
 // --- Estilos de PrimeReact (orden recomendado por la evaluación) ---
 // El tema (claro/oscuro) se inyecta dinámicamente vía applyTheme, no con un import fijo.

@@ -1,0 +1,99 @@
+{
+  "common": {
+    "error": "Error"
+  },
+  "nav": {
+    "posts": "Posts",
+    "help": "Help"
+  },
+  "actions": {
+    "logout": "Log out",
+    "cancel": "Cancel",
+    "refresh": "Refresh",
+    "clear": "Clear",
+    "download": "Download",
+    "create": "Create",
+    "save": "Save changes",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "theme": {
+    "toDark": "Switch to dark mode",
+    "toLight": "Switch to light mode",
+    "dark": "Dark mode",
+    "light": "Light mode"
+  },
+  "language": {
+    "label": "Language",
+    "spanish": "Spanish",
+    "english": "English"
+  },
+  "login": {
+    "title": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "usernameRequired": "Username is required.",
+    "passwordRequired": "Password is required.",
+    "error": "Authentication error."
+  },
+  "posts": {
+    "listTitle": "Posts list",
+    "new": "New post",
+    "refreshTooltip": "Fetch the latest data from the server",
+    "searchPlaceholder": "Search by title, author or tag…",
+    "filterUser": "Filter by author",
+    "filterTags": "Filter by tags",
+    "colId": "ID",
+    "colTitle": "Title",
+    "colUser": "Author",
+    "colTags": "Tags",
+    "colReactions": "Reactions",
+    "colActions": "Actions",
+    "empty": "No posts found.",
+    "loadError": "The posts could not be loaded.",
+    "pageReport": "{first}-{last} of {totalRecords}",
+    "confirmDeleteHeader": "Confirm deletion",
+    "confirmDeleteMessage": "Do you want to delete the post “{{title}}”?",
+    "confirmAccept": "Yes, delete",
+    "deletedSummary": "Deleted",
+    "deletedDetail": "The post was deleted successfully.",
+    "deleteErrorDetail": "The post could not be deleted.",
+    "viewAuthor": "Author"
+  },
+  "form": {
+    "newTitle": "New post",
+    "editTitle": "Edit post",
+    "titleLabel": "Title",
+    "contentLabel": "Content",
+    "authorLabel": "Author",
+    "tagsLabel": "Tags",
+    "authorPlaceholder": "Select an author",
+    "tagsPlaceholder": "Type and press Enter",
+    "tagsHelp": "Press Enter to add each tag (max. {{max}} characters per tag).",
+    "titleRequired": "Title is required.",
+    "titleMax": "Title allows a maximum of {{max}} characters.",
+    "contentRequired": "Content is required.",
+    "contentMin": "Content must be at least {{min}} characters.",
+    "contentMax": "Content allows a maximum of {{max}} characters.",
+    "authorRequired": "Please select an author.",
+    "createdSummary": "Post created",
+    "updatedSummary": "Post updated",
+    "createdDetail": "The post was created successfully.",
+    "updatedDetail": "The post was updated successfully.",
+    "saveErrorSummary": "Error",
+    "saveErrorDetail": "The post could not be saved."
+  },
+  "docs": {
+    "title": "Help & documentation",
+    "prev": "Previous page",
+    "next": "Next page",
+    "pageInput": "Page number",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Reset zoom",
+    "zoomIn": "Zoom in",
+    "download": "Download",
+    "loadError": "The PDF document could not be loaded."
+  }
+}
