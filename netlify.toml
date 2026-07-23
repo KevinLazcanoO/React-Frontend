@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Enrutado SPA: todas las rutas se sirven con index.html para que React Router
+# resuelva la vista (evita 404 al recargar en rutas como /posts/1/edit).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

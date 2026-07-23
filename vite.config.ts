@@ -9,5 +9,8 @@ export default defineConfig({
     globals: true, // Permite usar describe/it/expect sin importarlos en cada test.
     environment: 'jsdom', // Simula el DOM del navegador para poder renderizar componentes en los tests.
     setupFiles: './src/test/setup.ts', // Archivo que se ejecuta antes de cada suite de tests.
+    // Vitest solo corre los tests unitarios de src/. Los E2E (carpeta e2e/) los ejecuta Playwright.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 });

@@ -61,11 +61,14 @@ npm run dev        # Servidor de desarrollo (http://localhost:5173)
 npm run build      # Build de producción (type-check + Vite build)
 npm run preview    # Sirve el build de producción localmente
 
-npm test           # Ejecuta los tests una vez
-npm run test:watch # Tests en modo watch
+npm test           # Ejecuta los tests unitarios una vez
+npm run test:watch # Tests unitarios en modo watch
+npm run test:e2e   # Tests end-to-end con Playwright
 npm run lint       # Analiza el código con ESLint
 npm run format     # Formatea el código con Prettier
 ```
+
+> La primera vez que corras los E2E, instala el navegador: `npx playwright install chromium`.
 
 ---
 
@@ -84,7 +87,10 @@ npm run format     # Formatea el código con Prettier
 - **Contadores en el formulario** — Título `n/100`, Contenido `n/500` y Tags `n/5`, más un límite de `20` caracteres por tag. Los límites se aplican también con `maxLength` para impedir excederlos.
 - **Skeletons de carga** — La tabla muestra filas "fantasma" (`Skeleton`) durante la carga inicial, en lugar de una tabla vacía.
 - **Persistencia global del estado** — Las publicaciones se guardan en `localStorage` y se rehidratan al arrancar (`preloadedState`), de modo que las creadas/editadas **sobreviven a un refresco**. Un botón **Refrescar** vuelve a traer datos del servidor cuando se desee.
+- **Optimistic UI** — Editar y eliminar actualizan la tabla **al instante** (en la acción `pending`); si la API falla, se **revierte** el cambio al estado anterior (guardando un backup por id).
+- **Tests E2E** — Playwright cubre el flujo principal (ruta protegida, login y búsqueda en la tabla).
 - **Docker** — `Dockerfile` multi-stage (build con Node → servido con nginx) y `docker-compose.yml`.
+- **Deploy** — Configuración lista para **Vercel** (`vercel.json`) y **Netlify** (`netlify.toml`) con el rewrite de SPA.
 
 ---
 
@@ -100,6 +106,15 @@ docker compose up --build     # App en http://localhost:8080
 docker build -t proyecto-evaluacion .
 docker run -p 8080:80 proyecto-evaluacion
 ```
+
+---
+
+## ☁️ Deploy
+
+El proyecto incluye configuración lista para dos plataformas (ambas con el _rewrite_ a `index.html` que necesita una SPA):
+
+- **Vercel** — `vercel.json`. Importa el repo en Vercel y desplega (detecta Vite automáticamente).
+- **Netlify** — `netlify.toml` (`build = npm run build`, `publish = dist`).
 
 ---
 
@@ -137,17 +152,24 @@ src/
 - **Caché de carga.** `PostsPage` sólo consulta la API la primera vez (`status === 'idle'`), de modo que al volver del formulario se conservan en pantalla los cambios locales (altas/bajas/ediciones).
 - **Persistencia sin dependencias.** En lugar de `redux-persist`, un pequeño módulo (`app/persistence.ts`) guarda un subconjunto del estado en `localStorage` (con throttle) y lo rehidrata como `preloadedState`. Se usan tipos concretos —no `RootState`— para evitar una referencia circular de tipos, y `RootState` se deriva de `combineReducers`.
 - **Tema desacoplado del store.** El cambio de tema intercambia un `<link>` de CSS (vía imports `?url` de Vite) y se gestiona con un hook propio, sin acoplarlo a Redux.
+- **Optimistic UI con rollback.** Editar/eliminar mutan el estado en la acción `pending` y guardan un backup (`optimisticBackups[id]`) con el post y su posición. En `rejected` se restaura; en `fulfilled` se confirma y se descarta el backup.
 - **Notificaciones y loading centralizados.** El slice `ui` mantiene una cola de toasts y un contador de peticiones. Un único `GlobalToast` muestra los mensajes y una `GlobalLoadingBar` aparece automáticamente ante cualquier thunk en curso (vía `addMatcher` sobre las acciones `/pending` y `/fulfilled|/rejected`).
 
 ---
 
 ## 🧪 Tests
 
-12 tests en 3 archivos con Vitest (`npm test`):
+**Unitarios** — 15 tests en 3 archivos con Vitest (`npm test`):
 
 - `authSlice.test.ts` — reducers (`logout`, `login.fulfilled`/`rejected`) y thunk de **login** (éxito y fallo) con axios mockeado.
-- `postsSlice.test.ts` — reducers del CRUD y thunk **fetchPosts**.
+- `postsSlice.test.ts` — reducers del CRUD, **Optimistic UI** (aplicar y revertir editar/eliminar) y thunk **fetchPosts**.
 - `uiSlice.test.ts` — toasts y contador de carga.
+
+**E2E** — 3 tests con Playwright (`npm run test:e2e`), en `e2e/app.spec.ts`:
+
+- Redirección a `/login` al entrar sin sesión (ruta protegida).
+- Login correcto que muestra la tabla con datos reales.
+- Búsqueda global que filtra la tabla.
 
 ---
 
@@ -168,6 +190,4 @@ DummyJSON **simula** las escrituras: el `POST`, `PUT` y `DELETE` devuelven una r
 ## 🌟 Posibles mejoras (bonus pendientes)
 
 - Migrar los thunks a **RTK Query**.
-- **Optimistic UI** en editar/eliminar.
-- Tests E2E (Cypress/Playwright).
-- Deploy en Vercel / Netlify.
+- Ampliar la cobertura E2E (crear/editar/eliminar de punta a punta).

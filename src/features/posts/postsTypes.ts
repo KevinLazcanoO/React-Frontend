@@ -51,10 +51,18 @@ export interface DeletePostArg {
   isLocal?: boolean; // Si es local, lo quitamos solo del estado sin llamar a la API.
 }
 
+// Copia de seguridad de una publicación para poder revertir un cambio optimista.
+export interface OptimisticBackup {
+  post: Post; // Estado del post ANTES del cambio.
+  index: number; // Posición que ocupaba en la lista (para restaurarlo en su sitio).
+}
+
 // Forma del estado de publicaciones en Redux.
 export interface PostsState {
   items: Post[]; // Publicaciones cargadas.
   total: number; // Total de registros en el servidor (útil para paginación server-side).
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  // Backups por id para revertir editar/eliminar si la API falla (Optimistic UI).
+  optimisticBackups: Record<number, OptimisticBackup>;
 }

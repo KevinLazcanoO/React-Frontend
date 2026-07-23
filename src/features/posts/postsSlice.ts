@@ -16,6 +16,7 @@ const initialState: PostsState = {
   total: 0,
   status: 'idle',
   error: null,
+  optimisticBackups: {},
 };
 
 // Helper para uniformar el manejo de errores de axios en todos los thunks.
@@ -116,21 +117,59 @@ const postsSlice = createSlice({
       .addCase(createPost.rejected, (state, action) => {
         state.error = action.payload ?? 'Error al crear la publicación';
       })
-      // --- Edición: reemplazamos el post por su versión actualizada ---
+      // --- Edición (Optimistic UI) ---
+      // pending: aplicamos los cambios YA en pantalla y guardamos un backup para revertir.
+      .addCase(updatePost.pending, (state, action) => {
+        if (!state.optimisticBackups) state.optimisticBackups = {}; // Defensa por rehidratación.
+        const { id, changes } = action.meta.arg;
+        const index = state.items.findIndex((post) => post.id === id);
+        if (index !== -1) {
+          state.optimisticBackups[id] = { post: state.items[index], index }; // Backup previo.
+          state.items[index] = { ...state.items[index], ...changes }; // Cambio optimista.
+        }
+      })
+      // fulfilled: confirmamos con lo que devuelve la API y descartamos el backup.
       .addCase(updatePost.fulfilled, (state, action) => {
         const index = state.items.findIndex((post) => post.id === action.payload.id);
-        // Fusionamos el existente con lo devuelto (así conservamos reactions si la API no las reenvía).
         if (index !== -1) state.items[index] = { ...state.items[index], ...action.payload };
+        delete state.optimisticBackups[action.payload.id];
       })
+      // rejected: revertimos al backup (el post vuelve a su estado anterior).
       .addCase(updatePost.rejected, (state, action) => {
+        const { id } = action.meta.arg;
+        const backup = state.optimisticBackups?.[id];
+        if (backup) {
+          const index = state.items.findIndex((post) => post.id === id);
+          if (index !== -1) state.items[index] = backup.post; // Restauramos.
+          delete state.optimisticBackups[id];
+        }
         state.error = action.payload ?? 'Error al editar la publicación';
       })
-      // --- Borrado: quitamos el post del array por su id ---
-      .addCase(deletePost.fulfilled, (state, action) => {
-        state.items = state.items.filter((post) => post.id !== action.payload);
-        state.total = Math.max(0, state.total - 1);
+      // --- Borrado (Optimistic UI) ---
+      // pending: quitamos el post YA de la lista y guardamos backup (post + posición).
+      .addCase(deletePost.pending, (state, action) => {
+        if (!state.optimisticBackups) state.optimisticBackups = {}; // Defensa por rehidratación.
+        const { id } = action.meta.arg;
+        const index = state.items.findIndex((post) => post.id === id);
+        if (index !== -1) {
+          state.optimisticBackups[id] = { post: state.items[index], index }; // Backup previo.
+          state.items.splice(index, 1); // Borrado optimista.
+          state.total = Math.max(0, state.total - 1);
+        }
       })
+      // fulfilled: el borrado se confirmó, descartamos el backup.
+      .addCase(deletePost.fulfilled, (state, action) => {
+        delete state.optimisticBackups[action.payload];
+      })
+      // rejected: reinsertamos el post en su posición original.
       .addCase(deletePost.rejected, (state, action) => {
+        const { id } = action.meta.arg;
+        const backup = state.optimisticBackups?.[id];
+        if (backup) {
+          state.items.splice(backup.index, 0, backup.post); // Restauramos en su sitio.
+          state.total += 1;
+          delete state.optimisticBackups[id];
+        }
         state.error = action.payload ?? 'Error al eliminar la publicación';
       });
   },

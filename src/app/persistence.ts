@@ -40,6 +40,7 @@ export function persistState(state: { posts: PostsState }): void {
         total: state.posts.total,
         status: 'succeeded',
         error: null,
+        optimisticBackups: {}, // Los backups son transitorios: no se persisten.
       },
     };
     localStorage.setItem(PERSIST_KEY, JSON.stringify(toPersist));
