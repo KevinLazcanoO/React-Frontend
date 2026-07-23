@@ -19,3 +19,10 @@ body {
 .p-tooltip .p-tooltip-text {
   white-space: nowrap;
 }
+
+/* PrimeReact envuelve el <input> del componente Password en un <div class="p-icon-field">
+   (para poder colocar el ícono del ojo) que NO hereda el ancho completo por sí solo,
+   aunque el input y el contenedor raíz tengan "w-full". Lo forzamos aquí. */
+.p-password.w-full .p-icon-field {
+  width: 100%;
+}

@@ -77,7 +77,7 @@ export default function LoginPage() {
                   id="username"
                   placeholder={t('login.username')}
                   {...field} // value + onChange manejados por react-hook-form.
-                  className={fieldState.error ? 'p-invalid' : ''}
+                  className={`w-full ${fieldState.error ? 'p-invalid' : ''}`}
                   aria-invalid={fieldState.error ? 'true' : 'false'}
                 />
               )}
