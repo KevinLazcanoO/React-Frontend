@@ -1,0 +1,15 @@
+/* Reset mínimo y estilos globales base */
+* {
+  box-sizing: border-box; /* El padding/border no aumenta el tamaño total del elemento. */
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100vh; /* La app ocupa al menos toda la altura de la ventana. */
+}
+
+body {
+  font-family: var(--font-family); /* Usa la tipografía del tema de PrimeReact. */
+}

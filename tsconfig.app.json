@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Nivel de JS al que compila TypeScript.
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // APIs disponibles: JS moderno + DOM del navegador.
+    "module": "ESNext",
+    "skipLibCheck": true, // No re-verifica los tipos de node_modules (compila más rápido).
+
+    /* Modo bundler (Vite resuelve los imports, no tsc) */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true, // tsc solo verifica tipos; Vite genera el bundle.
+    "jsx": "react-jsx", // Habilita JSX sin necesidad de importar React en cada archivo.
+
+    /* Reglas estrictas (requerimiento: TypeScript estricto) */
+    "strict": true, // Activa todas las comprobaciones estrictas de tipos.
+    "noUnusedLocals": true, // Error si declaras una variable y no la usas.
+    "noUnusedParameters": true, // Error si un parámetro de función no se usa.
+    "noFallthroughCasesInSwitch": true, // Evita casos de switch sin break.
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"] // Solo compila el código de la aplicación.
+}
